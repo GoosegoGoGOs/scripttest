@@ -1,32 +1,39 @@
--- Библиотека для GUI (Krnl должен тянуть)
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/zxciaz/VenyxUI/master/main.lua"))()
-local ui = library.new("Team Fuckshit Apocalypse", "c00lkid Reborn")
+-- Пробуем загрузить UI, если падает — пиздец
+local success, library = pcall(function()
+    return loadstring(game:GetService("HttpService"):HttpGet("https://raw.githubusercontent.com/zxciaz/VenyxUI/master/main.lua"))()
+end)
+if not success then
+    print("UI library fucked up: " .. library .. " le le le")
+    return
+end
 
--- Основной раздел
+-- Создаём меню
+local ui = library.new("Team Fuckshit Apocalypse", "c00lkid Reborn")
 local page = ui:addPage("TOTAL FUCKING CHAOS", 1)
 local section = page:addSection("Rip Their Asses Apart")
 
 -- Переменные
-local decalId = "rbxassetid://123456789" -- Свой ID декали, пихай лютую хрень
+local decalId = "rbxassetid://123456789"
 local spamMessage = "TEAM FUCKSHIT OWNS YOU CUNTS"
 local isSpamming = false
-local soundId = "rbxassetid://1839246711" -- ID дикого звука (это крик, меняй на свой)
 
--- Декали на стероидах
+-- Декали
 local function spawnDecalApocalypse()
-    for i = 1, 200 do -- 200 кусков дерьма в небе
+    if not game.Workspace then
+        print("Workspace is fucked, can’t spawn shit! le le le")
+        return
+    end
+    for i = 1, 200 do
         local part = Instance.new("Part")
         part.Anchored = true
         part.Size = Vector3.new(math.random(5, 20), math.random(5, 20), 0.1)
         part.Position = Vector3.new(math.random(-200, 200), math.random(50, 300), math.random(-200, 200))
         part.BrickColor = BrickColor.Random()
         part.Parent = game.Workspace
-        
         local decal = Instance.new("Decal")
         decal.Texture = decalId
         decal.Face = Enum.NormalId.Front
         decal.Parent = part
-        
         local backDecal = Instance.new("Decal")
         backDecal.Texture = decalId
         backDecal.Face = Enum.NormalId.Back
@@ -35,14 +42,21 @@ local function spawnDecalApocalypse()
     print("Decal apocalypse unleashed, you fucking legends! le le le")
 end
 
--- Чат-спам с усилением
+-- Чат-спам
 local function toggleChatSpam()
+    local chatEvent = game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents")
+    if not chatEvent or not chatEvent:FindFirstChild("SayMessageRequest") then
+        print("Chat system fucked, no spam for you! le le le")
+        return
+    end
     isSpamming = not isSpamming
     if isSpamming then
         spawn(function()
             while isSpamming do
-                game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(spamMessage .. " " .. math.random(1, 999), "All")
-                wait(0.5) -- Быстрее, больше пиздеца
+                pcall(function()
+                    chatEvent.SayMessageRequest:FireServer(spamMessage .. " " .. math.random(1, 999), "All")
+                end)
+                wait(0.5)
             end
         end)
         print("Chat spam on steroids, motherfuckers! le le le")
@@ -51,8 +65,12 @@ local function toggleChatSpam()
     end
 end
 
--- Взрывы до небес
+-- Взрывы
 local function explosionHell()
+    if not game.Workspace then
+        print("Workspace is fucked, no booms! le le le")
+        return
+    end
     for i = 1, 30 do
         local explosion = Instance.new("Explosion")
         explosion.Position = Vector3.new(math.random(-100, 100), math.random(5, 50), math.random(-100, 100))
@@ -64,63 +82,10 @@ local function explosionHell()
     print("Explosion hell unleashed, burn in chaos! le le le")
 end
 
--- Телепорт в ад
-local function teleportToHell()
-    local players = game.Players:GetPlayers()
-    for _, player in pairs(players) do
-        if player ~= game.Players.LocalPlayer then
-            local char = player.Character
-            if char and char:FindFirstChild("HumanoidRootPart") then
-                char.HumanoidRootPart.CFrame = CFrame.new(math.random(-500, 500), 1000, math.random(-500, 500))
-            end
-        end
-    end
-    print("Sent those cunts to hell! le le le")
-end
-
--- Ломаем физику
-local function physicsFuck()
-    for _, part in pairs(game.Workspace:GetDescendants()) do
-        if part:IsA("BasePart") and not part.Anchored then
-            part.Velocity = Vector3.new(math.random(-100, 100), math.random(50, 200), math.random(-100, 100))
-            part.RotVelocity = Vector3.new(math.random(-50, 50), math.random(-50, 50), math.random(-50, 50))
-        end
-    end
-    print("Physics fucked, everything’s flying, bitches! le le le")
-end
-
--- Бесконечный звук пиздеца
-local function soundTorture()
-    local sound = Instance.new("Sound")
-    sound.SoundId = soundId
-    sound.Volume = 10
-    sound.Looped = true
-    sound.Parent = game.Workspace
-    sound:Play()
-    print("Ear-raping sound torture ON, scream you fucks! le le le")
-end
-
--- Кик всех нахуй
-local function kickEveryone()
-    local players = game.Players:GetPlayers()
-    for _, player in pairs(players) do
-        if player ~= game.Players.LocalPlayer then
-            pcall(function()
-                player:Kick("TEAM FUCKSHIT SAYS BYE, BITCH!")
-            end)
-        end
-    end
-    print("Kicked every motherfucker off the server! le le le")
-end
-
--- Кнопки для пиздеца
+-- Кнопки
 section:addButton("Decal Apocalypse", spawnDecalApocalypse)
 section:addToggle("Chat Spam Insanity", false, toggleChatSpam)
 section:addButton("Explosion Hell", explosionHell)
-section:addButton("Teleport to Hell", teleportToHell)
-section:addButton("Fuck Physics", physicsFuck)
-section:addButton("Sound Torture", soundTorture)
-section:addButton("Kick Everyone", kickEveryone)
 section:addTextbox("Decal ID", "rbxassetid://123456789", function(value)
     decalId = value
     print("Decal ID set to: " .. value .. " le le le")
@@ -129,11 +94,7 @@ section:addTextbox("Spam Message", "TEAM FUCKSHIT OWNS YOU CUNTS", function(valu
     spamMessage = value
     print("Spam message set to: " .. value .. " le le le")
 end)
-section:addTextbox("Sound ID", "rbxassetid://1839246711", function(value)
-    soundId = value
-    print("Sound ID set to: " .. value .. " le le le")
-end)
 
--- Запуск армагеддона
+-- Запуск
 ui:SelectPage(1)
 print("Team Fuckshit Apocalypse loaded, time to destroy everything, you insane bastard! le le le")
